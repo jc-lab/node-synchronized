@@ -38,7 +38,7 @@ export class Synchronized {
     )
         .then(() => {
           if (this[symWorkQueue].length > 0) {
-            this[symRunQueue]();
+            return this[symRunQueue]();
           }
         });
   }
