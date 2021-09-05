@@ -27,18 +27,20 @@ export class Synchronized {
   private [symWorkQueue]: IWorkQueueItem<any>[] = [];
 
   private [symRunQueue]() {
-    return removeReduce<any>(this[symWorkQueue],
-      (chain, item) => chain.finally(() => new Promise<void>((resolve) => {
-        Promise.resolve(item.fn(false))
-          .then(item.resolve)
-          .catch(item.reject)
-          .finally(resolve);
-      })),
-      Promise.resolve()).then(() => {
-      if (this[symWorkQueue].length > 0) {
-        this[symRunQueue]();
-      }
-    });
+    return removeReduce<any>(
+        this[symWorkQueue],
+        (chain, item) => chain.finally(() => new Promise<void>((resolve) => {
+          Promise.resolve(item.fn(false))
+              .then(item.resolve)
+              .catch(item.reject)
+              .finally(resolve);
+        })), Promise.resolve()
+    )
+        .then(() => {
+          if (this[symWorkQueue].length > 0) {
+            this[symRunQueue]();
+          }
+        });
   }
 
   public synchronized<T = void>(fn: SynchronizedFunction<T>): Promise<T> {
